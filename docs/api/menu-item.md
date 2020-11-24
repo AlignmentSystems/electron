@@ -159,7 +159,13 @@ A `String` (optional) indicating the item's role, if set. Can be `undo`, `redo`,
 
 #### `menuItem.accelerator`
 
-A `Accelerator` (optional) indicating the item's accelerator, if set.
+An `Accelerator` (optional) indicating the item's accelerator, if set.
+
+#### `menuItem.userAccelerator` _Readonly_ _macOS_
+
+An `Accelerator | null` indicating the item's [user-assigned accelerator](https://developer.apple.com/documentation/appkit/nsmenuitem/1514850-userkeyequivalent?language=objc) for the menu item.
+
+**Note:** This property is only initialized after the menu has been used once either via `.popup` or via `setApplicationMenu`. The value will always be `null` until that happens. It is also possible that users assign accelerators while the menu is running, if you want the latest possible value of `userAccelerator` ensure you call `setApplicationMenu` or `popup` just before checking this property.
 
 #### `menuItem.icon`
 

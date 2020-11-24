@@ -27,6 +27,7 @@ const MenuItem = function (this: any, options: any) {
   this.overrideReadOnlyProperty('accelerator');
   this.overrideReadOnlyProperty('icon');
   this.overrideReadOnlyProperty('submenu');
+  this.overrideReadOnlyProperty('userAccelerator', null);
 
   this.overrideProperty('label', roles.getDefaultLabel(this.role));
   this.overrideProperty('sublabel', '');
@@ -83,6 +84,7 @@ MenuItem.prototype.overrideReadOnlyProperty = function (name: string, defaultVal
   Object.defineProperty(this, name, {
     enumerable: true,
     writable: false,
+    configurable: true,
     value: this[name]
   });
 };

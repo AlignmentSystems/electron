@@ -47,6 +47,16 @@ if (process.platform === 'darwin') {
   Menu.prototype._getSharingItemForCommandId = function (id) {
     return this.commandsMap[id] ? this.commandsMap[id].sharingItem : null;
   };
+
+  Menu.prototype._provideUserKeyEquivalent = function (id, key) {
+    const command = this.commandsMap[id];
+    Object.defineProperty(command, 'userAccelerator', {
+      configurable: true,
+      enumerable: true,
+      writable: false,
+      value: key
+    });
+  };
 }
 
 Menu.prototype._executeCommand = function (event, id) {

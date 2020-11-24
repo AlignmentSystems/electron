@@ -20,6 +20,7 @@
 #include "shell/browser/native_window.h"
 #include "shell/browser/ui/electron_menu_model.h"
 #include "shell/browser/window_list.h"
+#include "shell/common/keyboard_util.h"
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/base/accelerators/platform_accelerator_cocoa.h"
 #include "ui/base/l10n/l10n_util_mac.h"
@@ -107,6 +108,24 @@ NSArray* ConvertSharingItemToNS(const SharingItem& item) {
       [result addObject:net::NSURLWithGURL(url)];
   }
   return result;
+}
+
+ui::Accelerator GetAcceleratorFromKeyEquivalentAndModifierMask(
+    NSString* key_equivalent,
+    NSUInteger modifier_mask) {
+  bool shifted;
+  ui::KeyboardCode code = electron::KeyboardCodeFromStr(
+      base::SysNSStringToUTF8(key_equivalent), &shifted);
+  int modifiers = 0;
+  if (modifier_mask & NSEventModifierFlagShift)
+    modifiers |= ui::EF_SHIFT_DOWN;
+  if (modifier_mask & NSEventModifierFlagControl)
+    modifiers |= ui::EF_CONTROL_DOWN;
+  if (modifier_mask & NSEventModifierFlagOption)
+    modifiers |= ui::EF_ALT_DOWN;
+  if (modifier_mask & NSEventModifierFlagCommand)
+    modifiers |= ui::EF_COMMAND_DOWN;
+  return ui::Accelerator(code, modifiers);
 }
 
 }  // namespace
@@ -392,14 +411,25 @@ static base::scoped_nsobject<NSMenu> recentDocumentsMenuSwap_;
     [item setRepresentedObject:[WeakPtrToElectronMenuModelAsNSObject
                                    weakPtrForModel:model]];
     ui::Accelerator accelerator;
+    NSString* key_equivalent = nil;
+    // For some reason this is the default modifier_mask :shrug:
+    NSUInteger modifier_mask = 1048576;
     if (model->GetAcceleratorAtWithParams(index, useDefaultAccelerator_,
                                           &accelerator)) {
-      NSString* key_equivalent;
-      NSUInteger modifier_mask;
       GetKeyEquivalentAndModifierMaskFromAccelerator(
           accelerator, &key_equivalent, &modifier_mask);
       [item setKeyEquivalent:key_equivalent];
       [item setKeyEquivalentModifierMask:modifier_mask];
+    }
+    NSString* user_key_equivalent = [item keyEquivalent];
+    NSUInteger user_modifier_mask = [item keyEquivalentModifierMask];
+    if ((key_equivalent &&
+         ![key_equivalent isEqualToString:user_key_equivalent]) ||
+        (!key_equivalent && [user_key_equivalent length] != 0) ||
+        modifier_mask != user_modifier_mask) {
+      model->ProvideUserKeyEquivalent(
+          index, GetAcceleratorFromKeyEquivalentAndModifierMask(
+                     user_key_equivalent, user_modifier_mask));
     }
 
     if (@available(macOS 10.13, *)) {

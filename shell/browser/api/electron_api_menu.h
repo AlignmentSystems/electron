@@ -68,6 +68,9 @@ class Menu : public gin::Wrappable<Menu>,
   bool GetSharingItemForCommandId(
       int command_id,
       ElectronMenuModel::SharingItem* item) const override;
+  void ProvideUserKeyEquivalent(
+      int command_id,
+      const ui::Accelerator& accelerator) const override;
 #endif
   void ExecuteCommand(int command_id, int event_flags) override;
   void OnMenuWillShow(ui::SimpleMenuModel* source) override;

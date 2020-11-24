@@ -128,6 +128,15 @@ bool Menu::GetSharingItemForCommandId(
                              "_getSharingItemForCommandId", command_id);
   return gin::ConvertFromV8(isolate, val, item);
 }
+
+void Menu::ProvideUserKeyEquivalent(int command_id,
+                                    const ui::Accelerator& accelerator) const {
+  v8::Isolate* isolate = JavascriptEnvironment::GetIsolate();
+  v8::HandleScope handle_scope(isolate);
+  gin_helper::CallMethod(isolate, const_cast<Menu*>(this),
+                         "_provideUserKeyEquivalent", command_id,
+                         accelerator.GetShortcutText());
+}
 #endif
 
 void Menu::ExecuteCommand(int command_id, int flags) {

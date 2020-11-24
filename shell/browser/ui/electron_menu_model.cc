@@ -102,6 +102,13 @@ const base::Optional<ElectronMenuModel::SharingItem>&
 ElectronMenuModel::GetSharingItem() const {
   return sharing_item_;
 }
+
+void ElectronMenuModel::ProvideUserKeyEquivalent(
+    int index,
+    const ui::Accelerator& accelerator) {
+  if (delegate_)
+    delegate_->ProvideUserKeyEquivalent(GetCommandIdAt(index), accelerator);
+}
 #endif
 
 void ElectronMenuModel::MenuWillClose() {

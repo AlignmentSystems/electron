@@ -51,6 +51,10 @@ class ElectronMenuModel : public ui::SimpleMenuModel {
 #if defined(OS_MAC)
     virtual bool GetSharingItemForCommandId(int command_id,
                                             SharingItem* item) const = 0;
+
+    virtual void ProvideUserKeyEquivalent(
+        int command_id,
+        const ui::Accelerator& accelerator) const = 0;
 #endif
 
    private:
@@ -94,6 +98,7 @@ class ElectronMenuModel : public ui::SimpleMenuModel {
   // Set/Get the SharingItem of this menu.
   void SetSharingItem(SharingItem item);
   const base::Optional<SharingItem>& GetSharingItem() const;
+  void ProvideUserKeyEquivalent(int index, const ui::Accelerator& accelerator);
 #endif
 
   // ui::SimpleMenuModel:
